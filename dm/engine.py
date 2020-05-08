@@ -6,11 +6,21 @@
 	@brief module component containing the main engine functions
 '''
 
+# standard libs/modules
+from os import sep
+from collections import namedtuple
+from configparser import ConfigParser
+
 # custom libs/modules
 from utility.constants_util import (ERR_TYPE, ERR_VALUE)
-from utility.base_util import setup_logger
+from utility.base_util import (setup_logger, create_dir, create_file)
 from .dm_exception import (DebugTypeError, DebugValueError)
 from .dm_constants import GAME_CONF_KEY
+from .dm_constants import (LOGGER_SECTION, ENGINE_SECTION)
+from .dm_constants import (LOGFILE_OPTION, LOGDIR_OPTION, LOGTOFILE_OPTION,
+	LOGTOSTDIO_OPTION)
+from .dm_constants import ENABLE_DEBUG_OPTION
+from .dm_constants import (ENABLE, DISABLE)
 
 class Engine:
 	'''
@@ -33,8 +43,19 @@ class Engine:
 		self._dbg_enabled = enabledbg
 
 		self._init = False
-		if kwargs.get(GAME_CONF_KEY) is not None:
-			print("Config file information : {}".format(kwargs))
+		self.engineconf = namedtuple('engineconf',
+				'log_fpath, log_fname log_level log_stdio log_fileio')
+		self.gameconf = kwargs.get(GAME_CONF_KEY)
+		if self.gameconf is not None:
+			create_dir("{}".format(self.gameconf[:self.gameconf.rfind(sep)]))
+			create_file(self.gameconf)
+			self.__parse_config()
+		else:
+			# write the function for creating the configuration file - like the
+			# default location
+			pass
+
+		# parse the configuration file and get the details
 		self._logger = None
 
 	def set_logger(self):
@@ -48,3 +69,20 @@ class Engine:
 			@brief member function to get the logger instance
 		'''
 		return self._logger
+	def __parse_config(self):
+		'''
+			@function __parse_config
+			@date Fri, 08 May 2020 22:26:56 +0530
+			@brief private member function to parse the configuration file
+		'''
+		cparser = ConfigParser()
+		cparser.read(self.gameconf)
+
+		self.engineconf.log_fname = cparser[LOGGER_SECTION][LOGFILE_OPTION]
+		self.engineconf.log_fpath = cparser[LOGGER_SECTION][LOGDIR_OPTION]
+		self.engineconf.log_fileio = cparser[LOGGER_SECTION][LOGTOFILE_OPTION]
+		self.engineconf.log_stdio = cparser[LOGGER_SECTION][LOGTOSTDIO_OPTION]
+		self.engineconf.log_level = cparser[ENGINE_SECTION][
+				ENABLE_DEBUG_OPTION]
+
+		print("filename set : {}".format(self.engineconf.log_fname))
