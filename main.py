@@ -33,15 +33,13 @@ def main():
 	engine = None
 
 	try:
-		engine = Engine(gameconf = "{}{}.config{}game.ini".format(
+		engine = Engine(gameconf = "{}{}config{}game.ini".format(
 			getcwd(), sep, sep))
 	except DebugTypeError as dbgtypeerr:
 		print(dbgtypeerr)
 	except DebugValueError as dbgvalerr:
 		print(dbgvalerr)
 
-	create_dir("{}{}.config".format(getcwd(), sep))
-	create_file("{}{}.config{}game.ini".format(getcwd(), sep, sep))
 	return 0
 
 if __name__ == '__main__':
