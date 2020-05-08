@@ -9,6 +9,7 @@
 # standard libs/modules
 from pathlib import Path
 from os import makedirs
+from logging import (Formatter, getLogger, FileHandler, StreamHandler)
 
 # custom libs/modules
 from .constants_util import (RES_TYPE_DIR, RES_TYPE_FILE)
@@ -107,3 +108,44 @@ def create_dir(res_path : str):
 	'''
 	if not __chkres(res_path, RES_TYPE_DIR):
 		__createres(res_path, RES_TYPE_DIR)
+
+def setup_logger(log_fpath, log_fname, log_level, log_stdio = False,
+				log_fileio = True):
+	'''
+		@function setup_logger
+		@date Fri, 08 May 2020 15:59:34 +0530
+		@brief function to set up the formatter of the logger instance and
+				return the instance
+		@params[IN] log_fpath : filepath of the log file
+					log_fname : filename of the log file, will be appended to
+					path
+					log_level : Logging level - DEBUG/WARN/ERROR etc
+					log_stdio : flag to show log lines in standard IO, False by
+					default
+					log_fileio : flag to write log lines in log file, True by
+							default
+		@return root_logger : logger instance
+	'''
+	log_fmt = Formatter("%(asctime)s : [%(threadName)-12.12s]" +
+						"[%(filename)s:%(lineno)s - %(funcName)s() ]" +
+									"[%(levelname)-5.5s]  %(message)s")
+	root_logger = getLogger()
+	fhandler = None	# file handler - writes to the file
+	chandler = None # console handler - writes to the stdio
+
+	# setting up the file handler
+	fhandler = FileHandler("{0}/{1}".format(log_fpath, log_fname))
+	fhandler.setFormatter(log_fmt)
+
+	# setting up the console handler
+	chandler = StreamHandler()
+	chandler.setFormatter(log_fmt)
+
+	if log_fileio:
+		root_logger.addHandler(fhandler)
+	if log_stdio:
+		root_logger.addHandler(chandler)
+
+	root_logger.setLevel(log_level)
+
+	return root_logger
