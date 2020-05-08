@@ -10,6 +10,7 @@
 from os import sep
 from collections import namedtuple
 from configparser import ConfigParser
+from logging import (DEBUG, INFO)
 
 # custom libs/modules
 from utility.constants_util import (ERR_TYPE, ERR_VALUE)
@@ -19,6 +20,8 @@ from .dm_constants import GAME_CONF_KEY
 from .dm_constants import (LOGGER_SECTION, ENGINE_SECTION)
 from .dm_constants import (LOGFILE_OPTION, LOGDIR_OPTION, LOGTOFILE_OPTION,
 	LOGTOSTDIO_OPTION)
+from .dm_constants import (LOGFILE_VALUE, LOGDIR_VALUE, LOGTOFILE_VALUE,
+		LOGTOSTDIO_VALUE, ENABLE_DEBUG_VALUE)
 from .dm_constants import ENABLE_DEBUG_OPTION
 from .dm_constants import (ENABLE, DISABLE)
 
@@ -82,7 +85,18 @@ class Engine:
 		self.engineconf.log_fpath = cparser[LOGGER_SECTION][LOGDIR_OPTION]
 		self.engineconf.log_fileio = cparser[LOGGER_SECTION][LOGTOFILE_OPTION]
 		self.engineconf.log_stdio = cparser[LOGGER_SECTION][LOGTOSTDIO_OPTION]
-		self.engineconf.log_level = cparser[ENGINE_SECTION][
-				ENABLE_DEBUG_OPTION]
+		self.engineconf.log_level = DEBUG if cparser[ENGINE_SECTION][
+				ENABLE_DEBUG_OPTION] == str(ENABLE) else INFO
 
-		print("filename set : {}".format(self.engineconf.log_fname))
+	def __create_config(self):
+		'''
+			@function __create_config
+			@date Sat, 09 May 2020 00:22:28 +0530
+			@brief private member function to create a default configuration
+			file
+		'''
+		cparser = ConfigParser()
+		cparser.read(self.gameconf)
+
+		cparser[LOGGER_SECTION] = {}
+		cparser[LOGGER_SECTION][LOGFILE_OPTION] = LOGFILE_VALUE
