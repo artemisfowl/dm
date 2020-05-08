@@ -18,7 +18,10 @@ from utility.base_util import (create_dir, create_file)
 """
 	Todo:
 	1. Create an utility module [done]
-	2. Create base function for checking existence of dir or file
+	2. Create base function for checking existence of dir or file [done]
+	3. Create constants to be used in the utility module [done]
+	4. Create dm module [done]
+	5. Add debugging feature for the program with argparse
 """
 
 def main():
