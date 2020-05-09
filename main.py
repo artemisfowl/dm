@@ -23,7 +23,9 @@ from dm.dm_exception import(DebugTypeError, DebugValueError)
 	2. Create base function for checking existence of dir or file [done]
 	3. Create constants to be used in the utility module [done]
 	4. Create dm module [done]
-	5. Add debugging feature for the program with configparser
+	5. Add debugging feature for the program with configparser [done]
+	6. Add function for creating a default configuration file if the developer
+	has not mentioned about one
 """
 
 def main():
