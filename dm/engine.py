@@ -7,7 +7,7 @@
 '''
 
 # standard libs/modules
-from os import sep
+from os import (sep, stat)
 from collections import namedtuple
 from configparser import ConfigParser
 from logging import (DEBUG, INFO)
@@ -52,13 +52,11 @@ class Engine:
 		if self.gameconf is not None:
 			create_dir("{}".format(self.gameconf[:self.gameconf.rfind(sep)]))
 			create_file(self.gameconf)
-			self.__parse_config()
-		else:
-			# write the function for creating the configuration file - like the
-			# default location
-			pass
+			if stat(self.gameconf).st_size == 0:
+				self.__create_config()
+			else:
+				self.__parse_config()
 
-		# parse the configuration file and get the details
 		self._logger = None
 
 	def set_logger(self):
@@ -83,8 +81,12 @@ class Engine:
 
 		self.engineconf.log_fname = cparser[LOGGER_SECTION][LOGFILE_OPTION]
 		self.engineconf.log_fpath = cparser[LOGGER_SECTION][LOGDIR_OPTION]
-		self.engineconf.log_fileio = cparser[LOGGER_SECTION][LOGTOFILE_OPTION]
-		self.engineconf.log_stdio = cparser[LOGGER_SECTION][LOGTOSTDIO_OPTION]
+		self.engineconf.log_fileio = True if (
+			cparser[LOGGER_SECTION][LOGTOFILE_OPTION] == str(ENABLE)) else (
+					False)
+		self.engineconf.log_stdio = True if (
+			cparser[LOGGER_SECTION][LOGTOSTDIO_OPTION] == str(ENABLE)) else (
+					False)
 		self.engineconf.log_level = DEBUG if cparser[ENGINE_SECTION][
 				ENABLE_DEBUG_OPTION] == str(ENABLE) else INFO
 
@@ -99,4 +101,22 @@ class Engine:
 		cparser.read(self.gameconf)
 
 		cparser[LOGGER_SECTION] = {}
-		cparser[LOGGER_SECTION][LOGFILE_OPTION] = LOGFILE_VALUE
+		cparser[LOGGER_SECTION][LOGFILE_OPTION] = str(LOGFILE_VALUE)
+		cparser[LOGGER_SECTION][LOGDIR_OPTION] = str(LOGDIR_VALUE)
+		cparser[LOGGER_SECTION][LOGTOFILE_OPTION] = str(LOGTOFILE_VALUE)
+		cparser[LOGGER_SECTION][LOGTOSTDIO_OPTION] = str(LOGTOSTDIO_VALUE)
+
+		cparser[ENGINE_SECTION] = {}
+		cparser[ENGINE_SECTION][ENABLE_DEBUG_OPTION] = str(ENABLE_DEBUG_VALUE)
+
+		with open(self.gameconf, "w") as f:
+			cparser.write(f)
+
+		self.engineconf.log_fname = LOGFILE_VALUE
+		self.engineconf.log_fpath = LOGDIR_VALUE
+		self.engineconf.log_fileio = True if LOGTOFILE_VALUE == ENABLE else (
+				False)
+		self.engineconf.log_stdio = True if LOGTOSTDIO_VALUE == ENABLE else (
+				False)
+		self.engineconf.log_level = DEBUG if cparser[ENGINE_SECTION][
+				ENABLE_DEBUG_OPTION] == str(ENABLE) else INFO
