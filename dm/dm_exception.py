@@ -6,18 +6,18 @@
 	@brief module component containing the dm custom exceptions
 '''
 
-class DebugTypeError(TypeError):
+class EnableLoggerTypeError(TypeError):
 	'''
-		@class DebugTypeError
+		@class EnableLoggerTypeError
 		@date Fri, 08 May 2020 15:49:12 +0530
 		@brief The type of value provided for setting debug is not the right
 		type
 	'''
 	pass
 
-class DebugValueError(ValueError):
+class EnableLoggerValueError(ValueError):
 	'''
-		@class DebugValueError
+		@class EnableLoggerValueError
 		@date Fri, 08 May 2020 15:50:58 +0530
 		@brief The value provided for setting debug is not the right
 		type
