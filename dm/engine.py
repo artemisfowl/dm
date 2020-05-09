@@ -15,7 +15,7 @@ from logging import (DEBUG, INFO)
 # custom libs/modules
 from utility.constants_util import (ERR_TYPE, ERR_VALUE)
 from utility.base_util import (setup_logger, create_dir, create_file)
-from .dm_exception import (DebugTypeError, DebugValueError)
+from .dm_exception import (EnableLoggerTypeError, EnableLoggerValueError)
 from .dm_constants import GAME_CONF_KEY
 from .dm_constants import (LOGGER_SECTION, ENGINE_SECTION)
 from .dm_constants import (LOGFILE_OPTION, LOGDIR_OPTION, LOGTOFILE_OPTION,
@@ -31,24 +31,27 @@ class Engine:
 		@date Fri, 08 May 2020 13:03:35 +0530
 		@brief Class containing the engine functionality
 	'''
-	def __init__(self, enable_logger : bool = False, **kwargs):
+	def __init__(self, gameconf : str, enable_logger : bool = False, **kwargs):
 		'''
 			@function __init__
 			@date Fri, 08 May 2020 15:21:39 +0530
 			@brief default constructor for Engine class
 			@param [IN] gameconf - string containing the path to the game
 			configuration file
+			enable_logger - boolean flag specifying if the logger has to be
+			enabled or not
 		'''
 		if not isinstance(enable_logger, bool):
-			raise DebugTypeError(ERR_TYPE.format("Enable logger", "boolean"))
+			raise EnableLoggerTypeError(ERR_TYPE.format(
+				"Enable logger", "boolean"))
 		elif enable_logger is None:
-			raise DebugValueError(ERR_VALUE.format("Boolean"))
+			raise EnableLoggerValueError(ERR_VALUE.format("Boolean"))
 		self._enable_logger = enable_logger
 
 		self._init = False
 		self.engineconf = namedtuple('engineconf',
 				'log_fpath, log_fname log_level log_stdio log_fileio')
-		self.gameconf = kwargs.get(GAME_CONF_KEY)
+		self.gameconf = gameconf
 		if self.gameconf is not None:
 			create_dir("{}".format(self.gameconf[:self.gameconf.rfind(sep)]))
 			create_file(self.gameconf)
@@ -83,7 +86,7 @@ class Engine:
 			@date Fri, 08 May 2020 22:26:56 +0530
 			@brief private member function to parse the configuration file
 		'''
-		cparser = ConfigParser()
+		cparser = self.__get_conf_parser()
 		cparser.read(self.gameconf)
 
 		self.engineconf.log_fname = cparser[LOGGER_SECTION][LOGFILE_OPTION]
@@ -104,15 +107,19 @@ class Engine:
 			@brief private member function to create a default configuration
 			file
 		'''
-		cparser = ConfigParser()
+		cparser = self.__get_conf_parser()
 		cparser.read(self.gameconf)
 
+		# creating the logger section - call other function
+		# TODO : Sun, 10 May 2020 01:22:55 +0530
 		cparser[LOGGER_SECTION] = {}
 		cparser[LOGGER_SECTION][LOGFILE_OPTION] = str(LOGFILE_VALUE)
 		cparser[LOGGER_SECTION][LOGDIR_OPTION] = str(LOGDIR_VALUE)
 		cparser[LOGGER_SECTION][LOGTOFILE_OPTION] = str(LOGTOFILE_VALUE)
 		cparser[LOGGER_SECTION][LOGTOSTDIO_OPTION] = str(LOGTOSTDIO_VALUE)
 
+		# creating the engine section - call other function
+		# TODO : Sun, 10 May 2020 01:23:08 +0530
 		cparser[ENGINE_SECTION] = {}
 		cparser[ENGINE_SECTION][ENABLE_DEBUG_OPTION] = str(ENABLE_DEBUG_VALUE)
 
@@ -127,3 +134,13 @@ class Engine:
 				False)
 		self.engineconf.log_level = DEBUG if cparser[ENGINE_SECTION][
 				ENABLE_DEBUG_OPTION] == str(ENABLE) else INFO
+
+	def __get_conf_parser(self):
+		'''
+			@function __get_conf_parser
+			@date Sun, 10 May 2020 01:21:07 +0530
+			@brief private member function to get the config parser object
+		'''
+		cparser = ConfigParser()
+
+		return cparser
