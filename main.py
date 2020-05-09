@@ -15,7 +15,7 @@ from os import (getcwd, sep)
 # custom libs/modules
 from utility.base_util import (create_dir, create_file)
 from dm.engine import Engine
-from dm.dm_exception import(DebugTypeError, DebugValueError)
+from dm.dm_exception import(EnableLoggerTypeError, EnableLoggerValueError)
 
 """
 	Todo:
@@ -26,6 +26,9 @@ from dm.dm_exception import(DebugTypeError, DebugValueError)
 	5. Add debugging feature for the program with configparser [done]
 	6. Add function for creating a default configuration file if the developer
 	has not mentioned about one
+	7. make gameconf mandatory [done]
+	8. read the logger section and engine debug section is the enable logger is
+	set
 """
 
 def main():
@@ -37,10 +40,10 @@ def main():
 	try:
 		engine = Engine(gameconf = "{}{}config{}game.ini".format(
 			getcwd(), sep, sep))
-	except DebugTypeError as dbgtypeerr:
-		print(dbgtypeerr)
-	except DebugValueError as dbgvalerr:
-		print(dbgvalerr)
+	except EnableLoggerTypeError as elterr:
+		print(elterr)
+	except EnableLoggerValueError as elverr:
+		print(elverr)
 
 	return 0
 
