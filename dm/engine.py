@@ -31,7 +31,7 @@ class Engine:
 		@date Fri, 08 May 2020 13:03:35 +0530
 		@brief Class containing the engine functionality
 	'''
-	def __init__(self, enabledbg : bool = False, **kwargs):
+	def __init__(self, enable_logger : bool = False, **kwargs):
 		'''
 			@function __init__
 			@date Fri, 08 May 2020 15:21:39 +0530
@@ -39,11 +39,11 @@ class Engine:
 			@param [IN] gameconf - string containing the path to the game
 			configuration file
 		'''
-		if not isinstance(enabledbg, bool):
-			raise DebugTypeError(ERR_TYPE.format("Enable debug", "boolean"))
-		elif enabledbg is None:
+		if not isinstance(enable_logger, bool):
+			raise DebugTypeError(ERR_TYPE.format("Enable logger", "boolean"))
+		elif enable_logger is None:
 			raise DebugValueError(ERR_VALUE.format("Boolean"))
-		self._dbg_enabled = enabledbg
+		self._enable_logger = enable_logger
 
 		self._init = False
 		self.engineconf = namedtuple('engineconf',
@@ -57,11 +57,18 @@ class Engine:
 			else:
 				self.__parse_config()
 
+		print("Logging information : {}".format(self.engineconf.log_fpath))
 		self._logger = None
 
 	def set_logger(self):
+		'''
+			@function set_logger
+			@date Sat, 09 May 2020 23:04:45 +0530
+			@brief member function to set up the logger
+			@note this function might be removed at a later point of time
+		'''
 		# call the setup_logger function here
-		pass
+		self._logger = None
 
 	def get_logger(self):
 		'''
