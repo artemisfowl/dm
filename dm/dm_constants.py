@@ -16,6 +16,13 @@ LOGTOFILE_OPTION = "logtofile"
 LOGTOSTDIO_OPTION = "logtostdio"
 ENABLE_DEBUG_OPTION = "enabledebug"
 
+# default values
+LOGFILE_VALUE = "engine"
+LOGDIR_VALUE = "logs"
+LOGTOFILE_VALUE = 1
+LOGTOSTDIO_VALUE = 0
+ENABLE_DEBUG_VALUE = 1
+
 # enable/disable constants
 ENABLE = 1
 DISABLE = 0
