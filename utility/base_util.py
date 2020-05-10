@@ -168,14 +168,11 @@ def parse_args(struct_engine_mode : namedtuple):
 	# elements handled in engine_mode_t -> struct_engine_mode
 	# gameconf, build_mode
 
-	# required arguments
-	build_mode_info = "Engine mode has to be in debug(1)/release(0) - required"
+	# optional arguments
+	build_mode_info = "Engine mode has to be in debug(1)/release(0)"
 	argsp.add_argument("--build-mode", help = build_mode_info, type = int)
 
-	# optional arguments
-	# NOTE : if the configuration file is not specified, a default
-	# configuration file will be created
-	gameconf_info = "Custom configuration filepath[absolute] - optional args"
+	gameconf_info = "Custom configuration filepath [absolute]"
 	argsp.add_argument("--config", help = gameconf_info)
 
 	pr = argsp.parse_args()
