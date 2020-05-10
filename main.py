@@ -11,9 +11,11 @@
 
 # standard libs/modules
 from os import (getcwd, sep)
+from collections import namedtuple
+from sys import exit
 
 # custom libs/modules
-from utility.base_util import (create_dir, create_file)
+from utility.base_util import (create_dir, create_file, parse_args)
 from dm.engine import Engine
 from dm.dm_exception import(EnableLoggerTypeError, EnableLoggerValueError)
 
@@ -32,14 +34,26 @@ from dm.dm_exception import(EnableLoggerTypeError, EnableLoggerValueError)
 """
 
 def main():
-	# create an instance of Engine
-	# let the engine take care of the config file reading
-	# from the config file the logger related information will be picked up
-	engine = None
-
 	try:
-		engine = Engine(gameconf = "{}{}config{}game.ini".format(
-			getcwd(), sep, sep))
+		engine_mode_t = namedtuple("engine_mode_t", "gameconf build_mode")
+		parse_args(engine_mode_t)
+
+		engine = None
+		if engine_mode_t.build_mode:
+			# this is the debugging mode
+			if engine_mode_t.gameconf is not None:
+				engine = Engine(gameconf = engine_mode_t.gameconf,
+						enable_logger = True)
+			else:
+				engine = Engine(gameconf = "{}{}config{}game.ini".format(
+					getcwd(), sep, sep), enable_logger = True)
+		else:
+			# release mode
+			if engine_mode_t.gameconf is not None:
+				engine = Engine(gameconf = engine_mode_t.gameconf)
+			else:
+				engine = Engine(gameconf = "{}{}config{}game.ini".format(
+					getcwd(), sep, sep))
 	except EnableLoggerTypeError as elterr:
 		print(elterr)
 	except EnableLoggerValueError as elverr:
