@@ -10,6 +10,8 @@
 from pathlib import Path
 from os import makedirs
 from logging import (Formatter, getLogger, FileHandler, StreamHandler)
+from collections import namedtuple
+from argparse import ArgumentParser
 
 # custom libs/modules
 from .constants_util import (RES_TYPE_DIR, RES_TYPE_FILE)
@@ -149,3 +151,33 @@ def setup_logger(log_fpath, log_fname, log_level, log_stdio = False,
 	root_logger.setLevel(log_level)
 
 	return root_logger
+
+def parse_args(struct_engine_mode : namedtuple):
+	'''
+		@function parse_args
+		@date Sun, 10 May 2020 12:21:57 +0530
+		@brief function to parse the arguments provided for engine
+		@param [IN] struct_engine_mode - namedtuple containing the fields to be
+		parsed from the arguments and populated
+	'''
+	if struct_engine_mode is None:
+		raise ValueError(ERR_VALUE.format("Engine mode structure"))
+
+	argsp = ArgumentParser()
+
+	# elements handled in engine_mode_t -> struct_engine_mode
+	# gameconf, build_mode
+
+	# required arguments
+	build_mode_info = "Engine mode has to be in debug(1)/release(0) - required"
+	argsp.add_argument("--build-mode", help = build_mode_info, type = int)
+
+	# optional arguments
+	# NOTE : if the configuration file is not specified, a default
+	# configuration file will be created
+	gameconf_info = "Custom configuration filepath[absolute] - optional args"
+	argsp.add_argument("--config", help = gameconf_info)
+
+	pr = argsp.parse_args()
+	struct_engine_mode.build_mode = True if (pr.build_mode == 1) else False
+	struct_engine_mode.gameconf = pr.config
