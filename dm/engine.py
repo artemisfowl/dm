@@ -81,7 +81,7 @@ class Engine:
 		create_dir(self.engineconf.log_fpath)
 
 		self._logger = setup_logger(log_fpath = self.engineconf.log_fpath,
-				log_fname = "{}{}.log".format(self.engineconf.log_fname,
+				log_fname = "{}_{}.log".format(self.engineconf.log_fname,
 					datetime.now().date()),
 				log_level = self.engineconf.log_level,
 				log_stdio = self.engineconf.log_stdio,
