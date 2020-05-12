@@ -7,3 +7,10 @@ The program would be running in 2 modes:
 1. **Release** - This is the default mode of the program/engine. The program will read from a packed file(_TBD_) and then the game will be handled from the program/engine side.
 2. **Debug** - This mode is the one where the program will allow for the development of a D&D game from scratch. This is the mode in which the resources would be loaded automatically and shown on the
 	 screen as and when added.
+
+#### Running the program
+There are no restrictions on the version of Python to be used other than the fact that the program leverages a few standard modules from the Python3 library.
+In order to run the program/engine, one can follow these steps:
+1. Open up terminal(Linux/Mac) or command prompt(Windows).
+2. In **Windows** check if python is present in the environment variables or not. If it is not, kindly add the same. For **Linux/Mac**, check the version of python being used with the command
+`python --version`.
