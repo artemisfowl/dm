@@ -30,6 +30,42 @@ usage: main.py [-h] [--build-mode BUILD_MODE] [--config CONFIG]
 optional arguments:
   -h, --help            show this help message and exit
   --build-mode BUILD_MODE
-                        Engine mode has to be in debug(1)/release(0)
+                        Engine mode has to be in debug(1)
   --config CONFIG       Custom configuration filepath [absolute]
 ```
+
+So, in order to run the engine in debug mode, just use `python main.py --build-mode 1` or for that matter `python3 main.py --build-mode 1`.
+
+When run in build mode - the logs would be created and a log file containing information would be present in the logs directory.
+
+#### Log information manipulation
+When the engine is run, it creates a directory called config where there is a file created by the name of game.ini. The contents of this file are as follows:
+
+```
+[logger]
+logfile = engine
+logdir = logs
+logtofile = 1
+logtostdio = 0
+enabledebug = 1
+
+[engine]
+enabledebug = 1
+```
+
+##### Game INI options
+1. The `logfile` contains the name of the log file which will be created inside the `logdir` directory. In the aforementioned case, the name of the log file would be
+`engine_2020-05-12.log`. For each day a new log file would be created so that the debugging mode becomes easier.
+
+A log file, when enabled, would have data as follows:
+
+```
+2020-05-12 17:13:53,243 : [MainThread  ][engine.py:72 - __init__() ][INFO ]  Logging information : logs
+2020-05-12 17:13:53,243 : [MainThread  ][engine.py:116 - _mainloop() ][INFO ]  Starting the main loop
+```
+
+2. The `logtofile` option is enabled by default. This allows for writing the information in the specified log file. If it is set to 0, the logging in the file would not be done.
+
+3. The `logtostdio` option is disabled by default. If this is enabled(value given as 1), the log lines will start showing up in the command prompt or the terminal itself.
+
+4. The `enabledebug` option is an experimental one and will be changed after deliberation as more code is added.
