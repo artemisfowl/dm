@@ -169,7 +169,7 @@ def parse_args(struct_engine_mode : namedtuple):
 	# gameconf, build_mode
 
 	# optional arguments
-	build_mode_info = "Engine mode has to be in debug(1)/release(0)"
+	build_mode_info = "Engine mode has to be in debug(1)"
 	argsp.add_argument("--build-mode", help = build_mode_info, type = int)
 
 	gameconf_info = "Custom configuration filepath [absolute]"
