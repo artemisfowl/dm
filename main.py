@@ -54,6 +54,9 @@ def main():
 			else:
 				engine = Engine(gameconf = "{}{}config{}game.ini".format(
 					getcwd(), sep, sep))
+
+		# mainloop - handles everything
+		engine.mainloop()
 	except EnableLoggerTypeError as elterr:
 		print(elterr)
 	except EnableLoggerValueError as elverr:
