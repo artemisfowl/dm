@@ -14,3 +14,5 @@ In order to run the program/engine, one can follow these steps:
 1. Open up terminal(Linux/Mac) or command prompt(Windows).
 2. In **Windows** check if python is present in the environment variables or not. If it is not, kindly add the same. For **Linux/Mac**, check the version of python being used with the command
 `python --version`.
+The python interpreter can be downloaded and installed from [here](https://www.python.org/).
+__NOTE__: Please note that in Linux, Python 3.x is present already most probably, so kindly get the version using the command `python3 --version` in the terminal.
