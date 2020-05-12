@@ -16,3 +16,18 @@ In order to run the program/engine, one can follow these steps:
 `python --version`.
 The python interpreter can be downloaded and installed from [here](https://www.python.org/).
 __NOTE__: Please note that in Linux, Python 3.x is present already most probably, so kindly get the version using the command `python3 --version` in the terminal.
+3. In the terminal itself navigate to the directory where the program is placed.
+4. As of now the program is not using any external library. The program can be run using the command `python main.py` or for that matter `python3 main.py`.
+
+In order to get more information about the program, one can also type `python main.py --help` or `python3 main.py --help`
+
+The help information would be as follows:
+```
+usage: main.py [-h] [--build-mode BUILD_MODE] [--config CONFIG]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --build-mode BUILD_MODE
+                        Engine mode has to be in debug(1)/release(0)
+  --config CONFIG       Custom configuration filepath [absolute]
+```
