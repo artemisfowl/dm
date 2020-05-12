@@ -11,6 +11,8 @@ from os import (sep, stat)
 from collections import namedtuple
 from configparser import ConfigParser
 from logging import (DEBUG, INFO)
+from datetime import datetime
+from sys import exit
 
 # custom libs/modules
 from utility.constants_util import (ERR_TYPE, ERR_VALUE)
@@ -55,13 +57,19 @@ class Engine:
 		if self.gameconf is not None:
 			create_dir("{}".format(self.gameconf[:self.gameconf.rfind(sep)]))
 			create_file(self.gameconf)
+
 			if stat(self.gameconf).st_size == 0:
 				self.__create_config()
 			else:
+				# first of all - read the logger information if the debug mode
+				# is enabled
 				self.__parse_config()
 
-		print("Logging information : {}".format(self.engineconf.log_fpath))
 		self._logger = None
+		if self._enable_logger:
+			self.set_logger()
+			self._logger.info("Logging information : {}".format(
+				self.engineconf.log_fpath))
 
 	def set_logger(self):
 		'''
@@ -70,8 +78,14 @@ class Engine:
 			@brief member function to set up the logger
 			@note this function might be removed at a later point of time
 		'''
-		# call the setup_logger function here
-		self._logger = None
+		create_dir(self.engineconf.log_fpath)
+
+		self._logger = setup_logger(log_fpath = self.engineconf.log_fpath,
+				log_fname = "{}{}.log".format(self.engineconf.log_fname,
+					datetime.now().date()),
+				log_level = self.engineconf.log_level,
+				log_stdio = self.engineconf.log_stdio,
+				log_fileio = self.engineconf.log_fileio)
 
 	def get_logger(self):
 		'''
@@ -80,6 +94,36 @@ class Engine:
 			@brief member function to get the logger instance
 		'''
 		return self._logger
+
+	def mainloop(self):
+		'''
+			@function mainloop
+			@date Tue, 12 May 2020 16:35:44 +0530
+			@brief member function to start the main loop
+		'''
+		while True:
+			self._mainloop()
+
+	def _mainloop(self):
+		'''
+			@function _mainloop
+			@date Tue, 12 May 2020 16:18:08 +0530
+			@brief private member function to start the main loop and handle
+			exit criteria
+		'''
+		try:
+			if self._enable_logger:
+				self._logger.info("Starting the main loop")
+			while True:
+				pass
+		except KeyboardInterrupt as kinterrupt:
+			choice = input("Are you sure you want to exit? [Y/n] : ")
+			if isinstance(choice, str):
+				if choice == "":
+					exit("Engine exiting")
+				if choice.lower()[0] == 'y':
+					exit("Engine exiting")
+
 	def __parse_config(self):
 		'''
 			@function __parse_config
@@ -89,16 +133,19 @@ class Engine:
 		cparser = self.__get_conf_parser()
 		cparser.read(self.gameconf)
 
-		self.engineconf.log_fname = cparser[LOGGER_SECTION][LOGFILE_OPTION]
-		self.engineconf.log_fpath = cparser[LOGGER_SECTION][LOGDIR_OPTION]
-		self.engineconf.log_fileio = True if (
-			cparser[LOGGER_SECTION][LOGTOFILE_OPTION] == str(ENABLE)) else (
-					False)
-		self.engineconf.log_stdio = True if (
-			cparser[LOGGER_SECTION][LOGTOSTDIO_OPTION] == str(ENABLE)) else (
-					False)
-		self.engineconf.log_level = DEBUG if cparser[ENGINE_SECTION][
-				ENABLE_DEBUG_OPTION] == str(ENABLE) else INFO
+		# read the logger section if debug mode is enabled for the engine
+		if self._enable_logger:
+			self.engineconf.log_fname = cparser[LOGGER_SECTION][LOGFILE_OPTION]
+			self.engineconf.log_fpath = cparser[LOGGER_SECTION][LOGDIR_OPTION]
+			self.engineconf.log_fileio = True if (
+				cparser[
+					LOGGER_SECTION][LOGTOFILE_OPTION] == str(ENABLE)) else (
+						False)
+			self.engineconf.log_stdio = True if (
+				cparser[LOGGER_SECTION][
+					LOGTOSTDIO_OPTION] == str(ENABLE)) else (
+						False)
+			self.engineconf.log_level = DEBUG
 
 	def __create_config(self):
 		'''
@@ -117,6 +164,7 @@ class Engine:
 		cparser[LOGGER_SECTION][LOGDIR_OPTION] = str(LOGDIR_VALUE)
 		cparser[LOGGER_SECTION][LOGTOFILE_OPTION] = str(LOGTOFILE_VALUE)
 		cparser[LOGGER_SECTION][LOGTOSTDIO_OPTION] = str(LOGTOSTDIO_VALUE)
+		cparser[LOGGER_SECTION][ENABLE_DEBUG_OPTION] = str(ENABLE_DEBUG_VALUE)
 
 		# creating the engine section - call other function
 		# TODO : Sun, 10 May 2020 01:23:08 +0530
@@ -126,14 +174,14 @@ class Engine:
 		with open(self.gameconf, "w") as f:
 			cparser.write(f)
 
-		self.engineconf.log_fname = LOGFILE_VALUE
-		self.engineconf.log_fpath = LOGDIR_VALUE
-		self.engineconf.log_fileio = True if LOGTOFILE_VALUE == ENABLE else (
-				False)
-		self.engineconf.log_stdio = True if LOGTOSTDIO_VALUE == ENABLE else (
-				False)
-		self.engineconf.log_level = DEBUG if cparser[ENGINE_SECTION][
-				ENABLE_DEBUG_OPTION] == str(ENABLE) else INFO
+		if self._enable_logger:
+			self.engineconf.log_fname = LOGFILE_VALUE
+			self.engineconf.log_fpath = LOGDIR_VALUE
+			self.engineconf.log_fileio = True if (
+					LOGTOFILE_VALUE == ENABLE) else False
+			self.engineconf.log_stdio = True if (
+					LOGTOSTDIO_VALUE == ENABLE) else False
+			self.engineconf.log_level = DEBUG
 
 	def __get_conf_parser(self):
 		'''
