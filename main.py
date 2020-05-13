@@ -12,7 +12,7 @@
 # standard libs/modules
 from os import (getcwd, sep)
 from collections import namedtuple
-from sys import exit
+from sys import (exit, version_info)
 
 # custom libs/modules
 from utility.base_util import (create_dir, create_file, parse_args)
@@ -27,10 +27,10 @@ from dm.dm_exception import(EnableLoggerTypeError, EnableLoggerValueError)
 	4. Create dm module [done]
 	5. Add debugging feature for the program with configparser [done]
 	6. Add function for creating a default configuration file if the developer
-	has not mentioned about one
+	has not mentioned about one [done]
 	7. make gameconf mandatory [done]
 	8. read the logger section and engine debug section is the enable logger is
-	set
+	set [done]
 """
 
 def main():
