@@ -14,6 +14,8 @@ from logging import (DEBUG, INFO)
 from datetime import datetime
 from sys import exit
 
+from logging import RootLogger
+
 # custom libs/modules
 from utility.constants_util import (ERR_TYPE, ERR_VALUE)
 from utility.base_util import (setup_logger, create_dir, create_file)
@@ -26,6 +28,7 @@ from .dm_constants import (LOGFILE_VALUE, LOGDIR_VALUE, LOGTOFILE_VALUE,
 		LOGTOSTDIO_VALUE, ENABLE_DEBUG_VALUE)
 from .dm_constants import ENABLE_DEBUG_OPTION
 from .dm_constants import (ENABLE, DISABLE)
+from .dm import Dm
 
 class Engine:
 	'''
@@ -71,6 +74,8 @@ class Engine:
 			self._logger.info("Logging information : {}".format(
 				self.engineconf.log_fpath))
 
+		self._dm = None
+
 	def set_logger(self):
 		'''
 			@function set_logger
@@ -112,17 +117,31 @@ class Engine:
 			exit criteria
 		'''
 		try:
+			self._dm = Dm(logger = self._logger)
+			if self._enable_logger:
+				self._logger.debug("Value of dm : {}".format(
+					self._dm.__dict__))
+			# this logging function needs to be streamlined
 			if self._enable_logger:
 				self._logger.info("Starting the main loop")
+				# this is to be used for the logging functions overridden
+				self._logger.info(isinstance(self._logger, RootLogger))
 			while True:
+				# Mon, 18 May 2020 23:05:12 +0530 - call the functions from dm
+				# - this module will contain the state machine and work with
+				# other entities
 				pass
 		except KeyboardInterrupt as kinterrupt:
 			choice = input("Are you sure you want to exit? [Y/n] : ")
 			if isinstance(choice, str):
 				if choice == "":
 					exit("Engine exiting")
-				if choice.lower()[0] == 'y':
+				elif choice.lower()[0] == 'y':
 					exit("Engine exiting")
+		finally:
+			if self._enable_logger:
+				self._logger.debug("Cleaning up pygame instance")
+			self._dm.cleanup()
 
 	def __parse_config(self):
 		'''
