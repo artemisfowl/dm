@@ -26,3 +26,6 @@ ENABLE_DEBUG_VALUE = 1
 # enable/disable constants
 ENABLE = 1
 DISABLE = 0
+
+# game constants
+DEFAULT_FPS = 30
