@@ -34,13 +34,18 @@ from dm.dm_exception import(EnableLoggerTypeError, EnableLoggerValueError)
 """
 
 def main():
+	'''
+		@function main
+		@date Wed, 13 May 2020 16:34:59 +0530
+		@brief main function, execution starts here
+	'''
 	try:
 		engine_mode_t = namedtuple("engine_mode_t", "gameconf build_mode")
 		parse_args(engine_mode_t)
 
 		engine = None
 		if engine_mode_t.build_mode:
-			# this is the debugging mode
+			# debug mode
 			if engine_mode_t.gameconf is not None:
 				engine = Engine(gameconf = engine_mode_t.gameconf,
 						enable_logger = True)
@@ -55,7 +60,6 @@ def main():
 				engine = Engine(gameconf = "{}{}config{}game.ini".format(
 					getcwd(), sep, sep))
 
-		# mainloop - handles everything
 		engine.mainloop()
 	except EnableLoggerTypeError as elterr:
 		print(elterr)
