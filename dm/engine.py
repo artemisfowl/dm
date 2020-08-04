@@ -24,8 +24,12 @@ from .dm_constants import GAME_CONF_KEY
 from .dm_constants import (LOGGER_SECTION, ENGINE_SECTION)
 from .dm_constants import (LOGFILE_OPTION, LOGDIR_OPTION, LOGTOFILE_OPTION,
 	LOGTOSTDIO_OPTION)
+from .dm_constants import (READ_RES_DIR_OPTION, READ_RES_DBG_DIR_OPTION,
+		READ_RES_REL_DIR_OPTION)
 from .dm_constants import (LOGFILE_VALUE, LOGDIR_VALUE, LOGTOFILE_VALUE,
 		LOGTOSTDIO_VALUE, ENABLE_DEBUG_VALUE)
+from .dm_constants import (READ_RES_DIR_VALUE, READ_RES_DBG_DIR_VALUE,
+		READ_RES_REL_DIR_VALUE)
 from .dm_constants import ENABLE_DEBUG_OPTION
 from .dm_constants import (ENABLE, DISABLE)
 from .dm import Dm
@@ -55,7 +59,9 @@ class Engine:
 
 		self._init = False
 		self.engineconf = namedtuple('engineconf',
-				'log_fpath, log_fname log_level log_stdio log_fileio')
+				'{} {} {} {} {} {} {} {}'.format("log_fpath", "log_fname",
+					"log_level", "log_stdio", "log_fileio",
+					"readresdir", "debugdir", "releasedir"))
 		self.gameconf = gameconf
 		if self.gameconf is not None:
 			create_dir("{}".format(self.gameconf[:self.gameconf.rfind(sep)]))
@@ -107,9 +113,9 @@ class Engine:
 			@brief member function to start the main loop
 		'''
 		while True:
-			self._mainloop()
+			self.__mainloop()
 
-	def _mainloop(self):
+	def __mainloop(self):
 		'''
 			@function _mainloop
 			@date Tue, 12 May 2020 16:18:08 +0530
@@ -117,20 +123,38 @@ class Engine:
 			exit criteria
 		'''
 		try:
-			self._dm = Dm(logger = self._logger)
+			# set the directory to be monitored - if the mode of the engine is
+			# debug, else set the zip file option for reading the released
+			# version of the game
+			self._dm = Dm(readdir = self.engineconf.readresdir,
+					logger = self._logger)
 			if self._enable_logger:
 				self._logger.debug("Value of dm : {}".format(
 					self._dm.__dict__))
+
 			# this logging function needs to be streamlined
 			if self._enable_logger:
 				self._logger.info("Starting the main loop")
 				# this is to be used for the logging functions overridden
 				self._logger.info(isinstance(self._logger, RootLogger))
+
+				self._logger.debug("Game resource directory : {}".format(
+					self.engineconf.readresdir))
+				self._logger.debug("Game resource debug directory : {}".format(
+					self.engineconf.debugdir))
+				self._logger.debug("Game resource release directory : {}".format(
+					self.engineconf.releasedir))
+
 			while True:
 				# Mon, 18 May 2020 23:05:12 +0530 - call the functions from dm
 				# - this module will contain the state machine and work with
 				# other entities
-				pass
+
+				# Tue, 04 Aug 2020 22:38:49 +0530 - present the developer with
+				# the choice to load the resources from the right game
+
+				self._dm.manage()
+				self._dm.update()
 		except KeyboardInterrupt as kinterrupt:
 			choice = input("Are you sure you want to exit? [Y/n] : ")
 			if isinstance(choice, str):
@@ -166,6 +190,14 @@ class Engine:
 						False)
 			self.engineconf.log_level = DEBUG
 
+		# read the engine section - the debug directory to be read
+		self.engineconf.readresdir = cparser[ENGINE_SECTION][
+				READ_RES_DIR_OPTION]
+		self.engineconf.debugdir = cparser[ENGINE_SECTION][
+				READ_RES_DBG_DIR_OPTION]
+		self.engineconf.releasedir = cparser[ENGINE_SECTION][
+				READ_RES_REL_DIR_OPTION]
+
 	def __create_config(self):
 		'''
 			@function __create_config
@@ -188,7 +220,11 @@ class Engine:
 		# creating the engine section - call other function
 		# TODO : Sun, 10 May 2020 01:23:08 +0530
 		cparser[ENGINE_SECTION] = {}
-		cparser[ENGINE_SECTION][ENABLE_DEBUG_OPTION] = str(ENABLE_DEBUG_VALUE)
+		cparser[ENGINE_SECTION][READ_RES_DIR_OPTION] = str(READ_RES_DIR_VALUE)
+		cparser[ENGINE_SECTION][READ_RES_DBG_DIR_OPTION] = str(
+				READ_RES_DBG_DIR_VALUE)
+		cparser[ENGINE_SECTION][READ_RES_REL_DIR_OPTION] = str(
+				READ_RES_REL_DIR_VALUE)
 
 		with open(self.gameconf, "w") as f:
 			cparser.write(f)
@@ -201,6 +237,12 @@ class Engine:
 			self.engineconf.log_stdio = True if (
 					LOGTOSTDIO_VALUE == ENABLE) else False
 			self.engineconf.log_level = DEBUG
+
+		self.engineconf.readresdir = READ_RES_DIR_VALUE
+
+		# write down the basic names of the debug and release directories
+		self.engineconf.debugdir = READ_RES_DBG_DIR_VALUE
+		self.engineconf.releasedir = READ_RES_REL_DIR_VALUE
 
 	def __get_conf_parser(self):
 		'''
