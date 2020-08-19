@@ -7,7 +7,7 @@
 '''
 
 # standard libs/modules
-from os import (sep, stat)
+from os import (sep, stat, listdir)
 from collections import namedtuple
 from configparser import ConfigParser
 from logging import (DEBUG, INFO)
@@ -81,6 +81,10 @@ class Engine:
 				self.engineconf.log_fpath))
 
 		self._dm = None
+		self.dbgp = None
+		self.relp = None
+		self.sel_dbgp = None
+		self.sel_relp = None
 
 	def set_logger(self):
 		'''
@@ -115,6 +119,121 @@ class Engine:
 		while True:
 			self.__mainloop()
 
+	def __load_projects(self):
+		'''
+			@function __load_projects
+			@date Tue, 18 Aug 2020 21:26:44 +0530
+			@brief function to list the projects present in the debug or
+			release directory
+		'''
+		if self._enable_logger:
+			self.dbgp = listdir("{}{}{}".format(
+				self.engineconf.readresdir, sep,
+				self.engineconf.debugdir))
+			self._logger.debug("Projects in dev : {}".format(self.dbgp))
+		else:
+			self.relp = listdir("{}{}{}".format(
+				self.engineconf.readresdir, sep,
+				self.engineconf.releasedir))
+
+	def choose_project(self):
+		'''
+			@function choose_project
+			@date Tue, 18 Aug 2020 22:11:15 +0530
+			@brief function to allow the user to choose a project or create a
+			new one
+		'''
+		self.__load_projects()
+
+		initial_choice = [
+				"Create new project.",
+				"Choose an existing project.",
+				]
+		while True:
+			for i in initial_choice:
+				print("{}. {}".format(initial_choice.index(i) + 1, i))
+
+			print("[Please enter the option number]")
+			choice = int(input(">>> "))
+
+			if choice == 1:
+				if self._enable_logger:
+					# engine running in debugging mode
+					self._logger.debug("Need new project name")
+				self.__set_project_name(iname = input(">_ "))
+			elif choice == 2:
+				if self._enable_logger:
+					# engine running in debugging mode
+					self._logger.debug("List of projects found : {}".format(
+						self.dbgp))
+
+				# show the list of projects found
+				self.__show_projects()
+
+			if self._enable_logger:
+				if self.sel_dbgp is not None:
+					break
+			else:
+				if self.sel_relp is not None:
+					break
+
+	def __show_projects(self):
+		'''
+			@function __show_projects
+			@date Wed, 19 Aug 2020 09:04:23 +0530
+			@brief function to show the detected projects
+		'''
+
+		while True:
+			if self._enable_logger:
+				# this is the debugging mode
+				self.__show_list(lname = self.dbgp)
+
+				sp_choice = int(input(">~ "))
+				self.sel_dbgp = self.dbgp[sp_choice - 1]
+				self._logger.debug("Chosen project name : {}".format(
+					self.sel_dbgp))
+			else:
+				# this is the release mode
+				self.__show_list(lname = self.relp)
+
+				sp_choice = int(input(">~ "))
+				self.sel_relp = self.relp[sp_choice - 1]
+
+			if self._enable_logger:
+				if self.sel_dbgp is not None:
+					break
+			else:
+				if self.sel_relp is not None:
+					break
+
+	def __show_list(self, lname = None):
+		'''
+			@function __show_list
+			@date Wed, 19 Aug 2020 09:06:20 +0530
+			@brief function to show the list contencts on the screen
+		'''
+		if lname is None or not isinstance(lname, list):
+			return
+
+		if len(lname) > 0:
+			for i in lname:
+				print("{}. {}".format(lname.index(i) + 1, i))
+		else:
+			print("No projects present, plese create a new one")
+			self.__set_project_name(iname = input(">_ "))
+
+	def __set_project_name(self, iname):
+		'''
+			@function __set_project_name
+			@date Wed, 19 Aug 2020 08:54:00 +0530
+			@brief function for setting the project name
+		'''
+		if self._enable_logger:
+			self.sel_dbgp = iname
+		else:
+			self.sel_relp = iname
+
 	def __mainloop(self):
 		'''
 			@function _mainloop
@@ -138,12 +257,7 @@ class Engine:
 				# this is to be used for the logging functions overridden
 				self._logger.info(isinstance(self._logger, RootLogger))
 
-				self._logger.debug("Game resource directory : {}".format(
-					self.engineconf.readresdir))
-				self._logger.debug("Game resource debug directory : {}".format(
-					self.engineconf.debugdir))
-				self._logger.debug("Game resource release directory : {}".format(
-					self.engineconf.releasedir))
+			self.choose_project()
 
 			while True:
 				# Mon, 18 May 2020 23:05:12 +0530 - call the functions from dm
@@ -152,6 +266,9 @@ class Engine:
 
 				# Tue, 04 Aug 2020 22:38:49 +0530 - present the developer with
 				# the choice to load the resources from the right game
+
+				# Tue, 18 Aug 2020 10:25:16 +0530 - working on getting the
+				# right resources from the directory
 
 				self._dm.manage()
 				self._dm.update()
