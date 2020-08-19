@@ -66,6 +66,8 @@ def main():
 		print(elterr)
 	except EnableLoggerValueError as elverr:
 		print(elverr)
+	except Exception as exc:
+		print(exc.with_traceback())
 	finally:
 		print("Exiting engine...")
 		return 0
