@@ -197,9 +197,6 @@ class Engine:
 				# this is the release mode
 				self.__show_list(lname = self.relp)
 
-				sp_choice = int(input(">~ "))
-				self.sel_relp = self.relp[sp_choice - 1]
-
 			if self._enable_logger:
 				if self.sel_dbgp is not None:
 					break
@@ -221,6 +218,9 @@ class Engine:
 				print("{}. {}".format(lname.index(i) + 1, i))
 		else:
 			print("No projects present, plese create a new one")
+			# Wed, 19 Aug 2020 13:15:26 +0530 - debating whether the user
+			# should be allowed to create it from here or create from the debug
+			# projects
 			self.__set_project_name(iname = input(">_ "))
 
 	def __set_project_name(self, iname):
@@ -245,6 +245,20 @@ class Engine:
 			# set the directory to be monitored - if the mode of the engine is
 			# debug, else set the zip file option for reading the released
 			# version of the game
+
+			self.choose_project()
+
+			if self._enable_logger:
+				self._logger.debug("Final debug path : {}{}{}{}{}".format(
+					self.engineconf.readresdir, sep,
+					self.engineconf.debugdir, sep,
+					self.sel_dbgp))
+			else:
+				print("Final release path : {}{}{}{}{}".format(
+					self.engineconf.readresdir, sep,
+					self.engineconf.debugdir, sep,
+					self.sel_relp))
+
 			self._dm = Dm(readdir = self.engineconf.readresdir,
 					logger = self._logger)
 			if self._enable_logger:
@@ -256,8 +270,6 @@ class Engine:
 				self._logger.info("Starting the main loop")
 				# this is to be used for the logging functions overridden
 				self._logger.info(isinstance(self._logger, RootLogger))
-
-			self.choose_project()
 
 			while True:
 				# Mon, 18 May 2020 23:05:12 +0530 - call the functions from dm
