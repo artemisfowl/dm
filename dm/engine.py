@@ -126,6 +126,9 @@ class Engine:
 			@brief function to list the projects present in the debug or
 			release directory
 		'''
+
+		# Thu, 17 Sep 2020 08:32:03 +0530 : the problem is that the parent
+		# directory is not created - ./parent/debug or release directory
 		if self._enable_logger:
 			self.dbgp = listdir("{}{}{}".format(
 				self.engineconf.readresdir, sep,
@@ -328,12 +331,15 @@ class Engine:
 				READ_RES_REL_DIR_OPTION]
 
 		# creating resource directory
+		create_dir(self.engineconf.readresdir)
 		if self._enable_logger:
 			# debug mode
-			create_dir(self.engineconf.debugdir)
+			create_dir("{}{}{}".format(self.engineconf.readresdir, sep,
+				self.engineconf.debugdir))
 		else:
 			# release mode
-			create_dir(self.engineconf.releasedir)
+			create_dir("{}{}{}".format(self.engineconf.readresdir, sep,
+				self.engineconf.releasedir))
 
 	def __create_config(self):
 		'''
@@ -380,6 +386,7 @@ class Engine:
 		self.engineconf.releasedir = READ_RES_REL_DIR_VALUE
 
 		# creating resource directory
+		create_dir(self.engineconf.readresdir)
 		if self._enable_logger:
 			# debug mode
 			create_dir(self.engineconf.debugdir)
