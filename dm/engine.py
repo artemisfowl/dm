@@ -330,16 +330,7 @@ class Engine:
 		self.engineconf.releasedir = cparser[ENGINE_SECTION][
 				READ_RES_REL_DIR_OPTION]
 
-		# creating resource directory
-		create_dir(self.engineconf.readresdir)
-		if self._enable_logger:
-			# debug mode
-			create_dir("{}{}{}".format(self.engineconf.readresdir, sep,
-				self.engineconf.debugdir))
-		else:
-			# release mode
-			create_dir("{}{}{}".format(self.engineconf.readresdir, sep,
-				self.engineconf.releasedir))
+		self.__create_res_dir()
 
 	def __create_config(self):
 		'''
@@ -385,14 +376,25 @@ class Engine:
 		self.engineconf.debugdir = READ_RES_DBG_DIR_VALUE
 		self.engineconf.releasedir = READ_RES_REL_DIR_VALUE
 
+		self.__create_res_dir()
+
+	def __create_res_dir(self):
+		'''
+			@function __create_res_dir
+			@date Thu, 17 Sep 2020 10:25:09 +0530
+			@brief function to create the resource directories if they are not
+			present
+		'''
 		# creating resource directory
 		create_dir(self.engineconf.readresdir)
 		if self._enable_logger:
 			# debug mode
-			create_dir(self.engineconf.debugdir)
+			create_dir("{}{}{}".format(self.engineconf.readresdir, sep,
+				self.engineconf.debugdir))
 		else:
 			# release mode
-			create_dir(self.engineconf.releasedir)
+			create_dir("{}{}{}".format(self.engineconf.readresdir, sep,
+				self.engineconf.releasedir))
 
 	def __get_conf_parser(self):
 		'''
