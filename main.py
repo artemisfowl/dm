@@ -31,6 +31,8 @@ from dm.dm_exception import(EnableLoggerTypeError, EnableLoggerValueError)
 	7. make gameconf mandatory [done]
 	8. read the logger section and engine debug section is the enable logger is
 	set [done]
+	9. poll the directory for any changes that might have been done and then
+	load the changes to be shown on the screen.
 """
 
 def main():
