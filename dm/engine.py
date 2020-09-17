@@ -327,6 +327,14 @@ class Engine:
 		self.engineconf.releasedir = cparser[ENGINE_SECTION][
 				READ_RES_REL_DIR_OPTION]
 
+		# creating resource directory
+		if self._enable_logger:
+			# debug mode
+			create_dir(self.engineconf.debugdir)
+		else:
+			# release mode
+			create_dir(self.engineconf.releasedir)
+
 	def __create_config(self):
 		'''
 			@function __create_config
@@ -338,7 +346,6 @@ class Engine:
 		cparser.read(self.gameconf)
 
 		# creating the logger section - call other function
-		# TODO : Sun, 10 May 2020 01:22:55 +0530
 		cparser[LOGGER_SECTION] = {}
 		cparser[LOGGER_SECTION][LOGFILE_OPTION] = str(LOGFILE_VALUE)
 		cparser[LOGGER_SECTION][LOGDIR_OPTION] = str(LOGDIR_VALUE)
@@ -347,7 +354,6 @@ class Engine:
 		cparser[LOGGER_SECTION][ENABLE_DEBUG_OPTION] = str(ENABLE_DEBUG_VALUE)
 
 		# creating the engine section - call other function
-		# TODO : Sun, 10 May 2020 01:23:08 +0530
 		cparser[ENGINE_SECTION] = {}
 		cparser[ENGINE_SECTION][READ_RES_DIR_OPTION] = str(READ_RES_DIR_VALUE)
 		cparser[ENGINE_SECTION][READ_RES_DBG_DIR_OPTION] = str(
@@ -372,6 +378,14 @@ class Engine:
 		# write down the basic names of the debug and release directories
 		self.engineconf.debugdir = READ_RES_DBG_DIR_VALUE
 		self.engineconf.releasedir = READ_RES_REL_DIR_VALUE
+
+		# creating resource directory
+		if self._enable_logger:
+			# debug mode
+			create_dir(self.engineconf.debugdir)
+		else:
+			# release mode
+			create_dir(self.engineconf.releasedir)
 
 	def __get_conf_parser(self):
 		'''
