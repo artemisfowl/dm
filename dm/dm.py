@@ -19,7 +19,11 @@ from pygame import (QUIT)
 
 # custom libs/modules
 from .dm_constants import (DEFAULT_FPS)
-from .bb import MenuState
+
+# Thu, 17 Sep 2020 12:57:31 +0530 : most probably this is not being used at
+# this moment - may not be even
+# required
+#from .bb import MenuState
 
 class Dm:
 	'''
@@ -60,11 +64,11 @@ class Dm:
 
 		# state machine
 		self._stmcon_obj = set() # container of the state objects
-		self._cur_stm = MenuState()	 # current state
+		#self._cur_stm = MenuState()	 # current state
 
 		# need to register the states to the statemachine - first set the
 		# variable with the project directory information
-		self._cur_stm.set_projects(self.__monitor_res())
+		#self._cur_stm.set_projects(self.__monitor_res())
 
 	def show(self):
 		'''
