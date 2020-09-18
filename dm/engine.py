@@ -157,13 +157,14 @@ class Engine:
 				print("{}. {}".format(initial_choice.index(i) + 1, i))
 
 			print("[Please enter the option number]")
+			# Fri, 18 Sep 2020 22:08:39 +0530 : prompt needs to be changed
 			choice = int(input(">>> "))
 
 			if choice == 1:
 				if self._enable_logger:
 					# engine running in debugging mode
 					self._logger.debug("Need new project name")
-				self.__set_project_name(iname = input(">_ "))
+				self.__set_project_name(iname = input("project name >_ "))
 			elif choice == 2:
 				if self._enable_logger:
 					# engine running in debugging mode
@@ -173,6 +174,7 @@ class Engine:
 				# show the list of projects found
 				self.__show_projects()
 
+			# create the project directory here
 			if self._enable_logger:
 				if self.sel_dbgp is not None:
 					break
@@ -192,15 +194,22 @@ class Engine:
 				# this is the debugging mode
 				self.__show_list(lname = self.dbgp)
 
-				sp_choice = int(input(">~ "))
-				self.sel_dbgp = self.dbgp[sp_choice - 1]
-				self._logger.debug("Chosen project name : {}".format(
-					self.sel_dbgp))
+				if self.sel_dbgp is None:
+					sp_choice = int(input("select project >~ "))
+					self.sel_dbgp = self.dbgp[sp_choice - 1]
+					self._logger.debug("Chosen project name : {}".format(
+						self.sel_dbgp))
 			else:
 				# this is the release mode
 				self.__show_list(lname = self.relp)
 
+				if self.sel_relp is None:
+					sp_choice = int(input("select project >~ "))
+					self.sel_relp = self.relp[sp_choice - 1]
+
 			if self._enable_logger:
+				self._logger.debug("Selected project : {}".format(
+					self.sel_dbgp))
 				if self.sel_dbgp is not None:
 					break
 			else:
@@ -224,7 +233,7 @@ class Engine:
 			# Wed, 19 Aug 2020 13:15:26 +0530 - debating whether the user
 			# should be allowed to create it from here or create from the debug
 			# projects
-			self.__set_project_name(iname = input(">_ "))
+			self.__set_project_name(iname = input("project name >_ "))
 
 	def __set_project_name(self, iname):
 		'''
@@ -234,8 +243,21 @@ class Engine:
 		'''
 		if self._enable_logger:
 			self.sel_dbgp = iname
+			self._logger.debug("Project name given : {}".format(iname))
+			self._logger.debug("Creating project fullpath : {}{}{}{}{}".format(
+					self.engineconf.readresdir, sep,
+					self.engineconf.debugdir, sep,
+					self.sel_dbgp))
+			create_dir("{}{}{}{}{}".format(
+					self.engineconf.readresdir, sep,
+					self.engineconf.debugdir, sep,
+					self.sel_dbgp))
 		else:
 			self.sel_relp = iname
+			create_dir("{}{}{}{}{}".format(
+					self.engineconf.readresdir, sep,
+					self.engineconf.releasedir, sep,
+					self.sel_relp))
 
 	def __mainloop(self):
 		'''
@@ -262,6 +284,10 @@ class Engine:
 					self.engineconf.debugdir, sep,
 					self.sel_relp))
 
+			# Thu, 17 Sep 2020 12:58:01 +0530 : the path that is being sent
+			# is not correct, have to check the code for reading the
+			# directory - also need to change the code for saving the newly
+			# created project
 			self._dm = Dm(readdir = self.engineconf.readresdir,
 					logger = self._logger)
 			if self._enable_logger:
