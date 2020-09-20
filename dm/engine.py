@@ -284,12 +284,26 @@ class Engine:
 					self.engineconf.debugdir, sep,
 					self.sel_relp))
 
-			# Thu, 17 Sep 2020 12:58:01 +0530 : the path that is being sent
-			# is not correct, have to check the code for reading the
-			# directory - also need to change the code for saving the newly
-			# created project
-			self._dm = Dm(readdir = self.engineconf.readresdir,
-					logger = self._logger)
+			# Sun, 20 Sep 2020 10:53:03 +0530 : This dm shoudl be setup with
+			# the right directory location as well as the right logger if it is
+			# set
+			if self._enable_logger:
+				self._logger.debug("Final debug path : {}{}{}{}{}".format(
+					self.engineconf.readresdir, sep,
+					self.engineconf.debugdir, sep,
+					self.sel_dbgp))
+				#self._dm = Dm(readdir = self.engineconf.readresdir,
+						#logger = self._logger)
+				self._dm = Dm(readdir = "{}{}{}{}{}".format(
+					self.engineconf.readresdir, sep,
+					self.engineconf.debugdir, sep,
+					self.sel_dbgp), logger = self._logger)
+			else:
+				self._dm = Dm(readdir = "{}{}{}{}{}".format(
+					self.engineconf.readresdir, sep,
+					self.engineconf.releasedir, sep,
+					self.sel_relp))
+
 			if self._enable_logger:
 				self._logger.debug("Value of dm : {}".format(
 					self._dm.__dict__))
