@@ -281,7 +281,7 @@ class Engine:
 			else:
 				print("Final release path : {}{}{}{}{}".format(
 					self.engineconf.readresdir, sep,
-					self.engineconf.debugdir, sep,
+					self.engineconf.releasedir, sep,
 					self.sel_relp))
 
 			# Sun, 20 Sep 2020 10:53:03 +0530 : This dm shoudl be setup with
