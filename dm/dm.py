@@ -16,9 +16,14 @@ from pygame import (init as pginit,
 		display as pgdisplay,
 		event as pgevent)
 from pygame import (QUIT)
+from watchdog.observers import Observer
+from watchdog.events import PatternMatchingEventHandler
 
 # custom libs/modules
 from .dm_constants import (DEFAULT_FPS)
+from .dm_constants import (PATTERNS, IGNORE_PATTERNS, IGNORE_DIRECTORIES,
+		CASE_SENSITIVE)
+from .dm_constants import (GO_RECURSIVELY)
 
 # Thu, 17 Sep 2020 12:57:31 +0530 : most probably this is not being used at
 # this moment - may not be even
@@ -69,6 +74,55 @@ class Dm:
 		# need to register the states to the statemachine - first set the
 		# variable with the project directory information
 		#self._cur_stm.set_projects(self.__monitor_res())
+
+		# watchdog observer
+		self.observer = Observer()
+		# Sat, 24 Oct 2020 00:27:27 +0530 : provide the right options in this
+		# section
+		self._res_evt_handler = PatternMatchingEventHandler(PATTERNS,
+				IGNORE_PATTERNS, IGNORE_DIRECTORIES, CASE_SENSITIVE)
+
+		# binding the functions
+		self._res_evt_handler.on_created = self._on_created
+		self._res_evt_handler.on_deleted = self._on_deleted
+		self._res_evt_handler.on_modified = self._on_modified
+		self._res_evt_handler.on_moved = self._on_moved
+
+	def stop_observer(self):
+		self.observer.stop()
+		self.observer.join()
+
+	def set_observer_scheduler(self):
+		# will I require monitor path? I don't think so
+		if self._logger is not None:
+			self._logger.debug("Monitor path : {}".format(self.rdir))
+
+		# need to raise an exception if the resource directory is not set
+		self.observer.schedule(self._res_evt_handler,
+				self.rdir, recursive = GO_RECURSIVELY)
+
+	def _on_created(self, event):
+		# Sun, 25 Oct 2020 19:21:05 +0530 : write in the logger for now
+		if self._logger is not None:
+			self._logger.debug(f"{event.src_path} has been created")
+
+	def _on_deleted(self, event):
+		# Sun, 25 Oct 2020 19:21:05 +0530 : write in the logger for now
+		# should I be doing something in this case? Maybe, just empty the
+		# memory which contains the data read from the file(s) removed
+		if self._logger is not None:
+			self._logger.debug(f"{event.src_path} has been deleted")
+
+	def _on_modified(self, event):
+		# Sun, 25 Oct 2020 19:21:05 +0530 : write in the logger for now
+		if self._logger is not None:
+			self._logger.debug(f"{event.src_path} has been modified")
+
+	def _on_moved(self, event):
+		# Sun, 25 Oct 2020 19:21:05 +0530 : write in the logger for now
+		# this will be tricky to handle
+		if self._logger is not None:
+			self._logger.debug(f"{event.src_path} has been moved")
 
 	def show(self):
 		'''
@@ -136,6 +190,9 @@ class Dm:
 		'''
 		tmp = pgdisplay.Info()
 		self._screen = pgdisplay.set_mode((tmp.current_w, tmp.current_h))
+
+		# temporary for testing purposes
+		#self._screen = pgdisplay.set_mode((1366, 768))
 
 	def __get_resolutions(self):
 		'''
