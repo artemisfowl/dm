@@ -11,6 +11,7 @@ from os import (sep, stat, listdir)
 from collections import namedtuple
 from configparser import ConfigParser
 from logging import (DEBUG, INFO)
+from logging import exception
 from datetime import datetime
 from sys import exit
 
@@ -85,6 +86,7 @@ class Engine:
 		self.relp = None
 		self.sel_dbgp = None
 		self.sel_relp = None
+		self.run = True
 
 	def set_logger(self):
 		'''
@@ -116,7 +118,7 @@ class Engine:
 			@date Tue, 12 May 2020 16:35:44 +0530
 			@brief member function to start the main loop
 		'''
-		while True:
+		while self.run:
 			self.__mainloop()
 
 	def __load_projects(self):
@@ -286,14 +288,11 @@ class Engine:
 
 			# Sun, 20 Sep 2020 10:53:03 +0530 : This dm shoudl be setup with
 			# the right directory location as well as the right logger if it is
-			# set
 			if self._enable_logger:
 				self._logger.debug("Final debug path : {}{}{}{}{}".format(
 					self.engineconf.readresdir, sep,
 					self.engineconf.debugdir, sep,
 					self.sel_dbgp))
-				#self._dm = Dm(readdir = self.engineconf.readresdir,
-						#logger = self._logger)
 				self._dm = Dm(readdir = "{}{}{}{}{}".format(
 					self.engineconf.readresdir, sep,
 					self.engineconf.debugdir, sep,
@@ -314,6 +313,13 @@ class Engine:
 				# this is to be used for the logging functions overridden
 				self._logger.info(isinstance(self._logger, RootLogger))
 
+			# Mon, 19 Oct 2020 23:38:20 +0530 : enable a observer to check for
+			# changes in the file structure - this should enable hot-reloading
+			self._dm.set_observer_scheduler()
+
+			# Sun, 25 Oct 2020 19:18:17 +0530 : start the observer as well as
+			# merge when exiting the program
+			self._dm.observer.start()
 			while True:
 				# Mon, 18 May 2020 23:05:12 +0530 - call the functions from dm
 				# - this module will contain the state machine and work with
@@ -334,10 +340,17 @@ class Engine:
 					exit("Engine exiting")
 				elif choice.lower()[0] == 'y':
 					exit("Engine exiting")
+		except Exception as exc:
+			if self._enable_logger:
+				exception(exc)
 		finally:
 			if self._enable_logger:
 				self._logger.debug("Cleaning up pygame instance")
-			self._dm.cleanup()
+			if self._dm:
+				self._dm.cleanup()
+
+			self._dm.stop_observer()
+			self.run = False
 
 	def __parse_config(self):
 		'''
