@@ -41,3 +41,12 @@ DEFAULT_FPS = 30
 
 # state identifiers
 MENU_STATE_ID = 1000
+
+# resource pattern
+PATTERNS = ["*"]
+IGNORE_PATTERNS = ""
+IGNORE_DIRECTORIES = False
+CASE_SENSITIVE = True
+
+# observer settings
+GO_RECURSIVELY = True
