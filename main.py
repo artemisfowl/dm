@@ -12,7 +12,8 @@
 # standard libs/modules
 from os import (getcwd, sep)
 from collections import namedtuple
-from sys import (exit, version_info)
+from sys import (exit, version_info, stdout)
+from traceback import print_exc
 
 # custom libs/modules
 from utility.base_util import (create_dir, create_file, parse_args)
@@ -69,7 +70,7 @@ def main():
 	except EnableLoggerValueError as elverr:
 		print(elverr)
 	except Exception as exc:
-		print(exc.with_traceback())
+		print_exc(file = stdout)
 	finally:
 		print("Exiting engine...")
 		return 0
