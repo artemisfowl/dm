@@ -23,3 +23,12 @@ class EnableLoggerValueError(ValueError):
 		type
 	'''
 	pass
+
+class ResourceDirException(Exception):
+	'''
+		@class ResourceDirError
+		@date Thu, 05 Nov 2020 18:32:22 +0530
+		@brief Exception to be thrown when the resource directory to be
+		monitored is either not present or wrong path is set
+	'''
+	pass

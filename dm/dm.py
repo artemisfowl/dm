@@ -24,11 +24,8 @@ from .dm_constants import (DEFAULT_FPS)
 from .dm_constants import (PATTERNS, IGNORE_PATTERNS, IGNORE_DIRECTORIES,
 		CASE_SENSITIVE)
 from .dm_constants import (GO_RECURSIVELY)
-
-# Thu, 17 Sep 2020 12:57:31 +0530 : most probably this is not being used at
-# this moment - may not be even
-# required
-#from .bb import MenuState
+from .dm_exception import ResourceDirException
+from states.menustate import MenuState
 
 class Dm:
 	'''
@@ -68,8 +65,11 @@ class Dm:
 		self.__get_resolutions()
 
 		# state machine
-		self._stmcon_obj = set() # container of the state objects
-		#self._cur_stm = MenuState()	 # current state
+		#self._stmcon_obj = set() # container of the state objects - looking at
+		# it later on
+		# Fri, 06 Nov 2020 00:38:05 +0530 : set up the right state for the game
+		# selected
+		self._state = MenuState()
 
 		# need to register the states to the statemachine - first set the
 		# variable with the project directory information
@@ -89,15 +89,21 @@ class Dm:
 		self._res_evt_handler.on_moved = self._on_moved
 
 	def stop_observer(self):
+		'''
+			@function stop_observer
+			@brief function to stop the observer at while exiting the engine
+		'''
 		self.observer.stop()
 		self.observer.join()
 
 	def set_observer_scheduler(self):
-		# will I require monitor path? I don't think so
 		if self._logger is not None:
 			self._logger.debug("Monitor path : {}".format(self.rdir))
 
 		# need to raise an exception if the resource directory is not set
+		if self.rdir is None:
+			raise ResourceDirException("Resource Directory path not provided")
+
 		self.observer.schedule(self._res_evt_handler,
 				self.rdir, recursive = GO_RECURSIVELY)
 
@@ -155,7 +161,6 @@ class Dm:
 			@brief function handling all the events and the other things
 			happening in the game - the dungeon master itself impersonated
 		'''
-		# setup the initial state
 		for event in pgevent.get():
 			self.__handle_events(event)
 
