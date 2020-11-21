@@ -310,16 +310,8 @@ class Engine:
 			# this logging function needs to be streamlined
 			if self._enable_logger:
 				self._logger.info("Starting the main loop")
-				# this is to be used for the logging functions overridden
-				self._logger.info(isinstance(self._logger, RootLogger))
 
-			# Mon, 19 Oct 2020 23:38:20 +0530 : enable a observer to check for
-			# changes in the file structure - this should enable hot-reloading
-			self._dm.set_observer_scheduler()
-
-			# Sun, 25 Oct 2020 19:18:17 +0530 : start the observer as well as
-			# merge when exiting the program
-			self._dm.observer.start()
+			self._dm.init_watch()
 			while True:
 				# Mon, 18 May 2020 23:05:12 +0530 - call the functions from dm
 				# - this module will contain the state machine and work with

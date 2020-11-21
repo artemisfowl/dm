@@ -7,7 +7,7 @@
 '''
 
 # standard libs/modules
-from os import environ
+from os import (environ, sep)
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 
 # third-party libs/modules
@@ -24,6 +24,7 @@ from .dm_constants import (DEFAULT_FPS)
 from .dm_constants import (PATTERNS, IGNORE_PATTERNS, IGNORE_DIRECTORIES,
 		CASE_SENSITIVE)
 from .dm_constants import (GO_RECURSIVELY)
+from .dm_constants import (DM_JSON)
 from .dm_exception import ResourceDirException
 from states.menustate import MenuState
 
@@ -123,6 +124,16 @@ class Dm:
 		# Sun, 25 Oct 2020 19:21:05 +0530 : write in the logger for now
 		if self._logger is not None:
 			self._logger.debug(f"{event.src_path} has been modified")
+			self._logger.debug(f"Directory changed : {event.is_directory}")
+
+		if not event.is_directory:
+			filename = event.src_path
+			filename = filename[filename.rfind(sep)+1:]
+
+			# populate the data in the DM model - and the model needs to be
+			# updated based on the input set up by the author
+			if self._logger is not None and filename == DM_JSON:
+				self._logger.debug("Main DM file changed, reloading data")
 
 	def _on_moved(self, event):
 		# Sun, 25 Oct 2020 19:21:05 +0530 : write in the logger for now
@@ -163,6 +174,15 @@ class Dm:
 		'''
 		for event in pgevent.get():
 			self.__handle_events(event)
+
+	def init_watch(self):
+		'''
+			@function init_watch
+			@date Thu, 19 Nov 2020 09:18:58 +0530
+			@brief function to start the watch for the filesystem watches
+		'''
+		self.set_observer_scheduler()
+		self.observer.start()
 
 	def __handle_events(self, event = None):
 		'''

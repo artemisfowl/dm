@@ -50,3 +50,6 @@ CASE_SENSITIVE = True
 
 # observer settings
 GO_RECURSIVELY = True
+
+# main file
+DM_JSON = "dm.json"
