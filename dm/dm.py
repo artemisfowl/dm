@@ -66,11 +66,9 @@ class Dm:
 		self.__get_resolutions()
 
 		# state machine
-		#self._stmcon_obj = set() # container of the state objects - looking at
-		# it later on
-		# Fri, 06 Nov 2020 00:38:05 +0530 : set up the right state for the game
-		# selected
-		self._state = MenuState()
+		# Thu, 01 Apr 2021 00:36:24 +0530 : the first state will be that of the
+		# title state - create title state
+		self._state = None
 
 		# need to register the states to the statemachine - first set the
 		# variable with the project directory information

@@ -313,16 +313,8 @@ class Engine:
 
 			self._dm.init_watch()
 			while True:
-				# Mon, 18 May 2020 23:05:12 +0530 - call the functions from dm
-				# - this module will contain the state machine and work with
-				# other entities
-
-				# Tue, 04 Aug 2020 22:38:49 +0530 - present the developer with
-				# the choice to load the resources from the right game
-
-				# Tue, 18 Aug 2020 10:25:16 +0530 - working on getting the
-				# right resources from the directory
-
+				# Thu, 01 Apr 2021 00:33:17 +0530 : DM will be handling the UI
+				# as well as the things to be shown in the UI(user facing)
 				self._dm.manage()
 				self._dm.update()
 		except KeyboardInterrupt as kinterrupt:
