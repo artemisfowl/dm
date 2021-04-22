@@ -312,11 +312,7 @@ class Engine:
 				self._logger.info("Starting the main loop")
 
 			self._dm.init_watch()
-			while True:
-				# Thu, 01 Apr 2021 00:33:17 +0530 : DM will be handling the UI
-				# as well as the things to be shown in the UI(user facing)
-				self._dm.manage()
-				self._dm.update()
+			self._dm.run()
 		except KeyboardInterrupt as kinterrupt:
 			choice = input("Are you sure you want to exit? [Y/n] : ")
 			if isinstance(choice, str):
