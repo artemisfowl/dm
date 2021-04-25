@@ -13,7 +13,8 @@ from uuid import uuid4
 # custom libs/modules
 from .state import State
 from .stateconstants import (ENGINE_BG_RESOURCE_DIR,
-		ENGINE_BG_ENGINE_TITLE_STATE_MUS)
+		ENGINE_BG_ENGINE_TITLE_STATE_MUS,
+		TAG_ENGINETITLESTATE)
 
 class EngineTitleState(State):
 	def __init__(self):
@@ -27,7 +28,7 @@ class EngineTitleState(State):
 		self.bg_path = ENGINE_BG_ENGINE_TITLE_STATE_MUS
 
 	def _set_uuid_(self):
-		self.__uuid = uuid4()
+		self.__uuid = TAG_ENGINETITLESTATE
 
 	def get_mus(self):
 		return self.bg_path

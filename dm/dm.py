@@ -9,13 +9,18 @@
 # standard libs/modules
 from os import (environ, sep)
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
+from random import randint
 
 # third-party libs/modules
 from pygame import (init as pginit,
 		quit as pgquit,
 		display as pgdisplay,
-		event as pgevent)
+		event as pgevent,
+		image as pgimage,
+		transform as pgtransform,
+		mixer as pgmixer)
 from pygame import (QUIT)
+from pygame.time import Clock as pgclock
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 
@@ -26,7 +31,10 @@ from .dm_constants import (PATTERNS, IGNORE_PATTERNS, IGNORE_DIRECTORIES,
 from .dm_constants import (GO_RECURSIVELY)
 from .dm_constants import (DM_JSON)
 from .dm_exception import ResourceDirException
-from states.menustate import MenuState
+from .soundmgr import SoundMgr
+from states.enginetitlestate import EngineTitleState
+from states.stateconstants import (ENGINE_BG_ENGINE_TITLE_STATE_MUS,
+		TAG_ENGINETITLESTATE)
 
 class Dm:
 	'''
@@ -53,7 +61,14 @@ class Dm:
 			self.rdir = None
 
 		# setup the pygame environment
+		pgmixer.init()
 		pginit()
+
+		# setting up the clock
+		self._clock = pgclock()
+
+		# setting up the mixer
+		self._soundmgr = SoundMgr()
 
 		# pygame essentials
 		self._screen = None	# in this one the mode will be set
@@ -68,7 +83,13 @@ class Dm:
 		# state machine
 		# Thu, 01 Apr 2021 00:36:24 +0530 : the first state will be that of the
 		# title state - create title state
-		self._state = None
+		self._state = dict()
+		self._state[TAG_ENGINETITLESTATE] = EngineTitleState()
+
+		# sound should be loaded from the state - this needs to be handled from
+		# the state
+		#self._bg_sound = pgmixer.Sound(ENGINE_BG_ENGINE_TITLE_STATE_MUS)
+		# classes is not working
 
 		# need to register the states to the statemachine - first set the
 		# variable with the project directory information
@@ -139,6 +160,31 @@ class Dm:
 		if self._logger is not None:
 			self._logger.debug(f"{event.src_path} has been moved")
 
+	def _check_state(self):
+		# need to check which state is being run at this moment - basically
+		# current state would be returned from this function
+		pass
+
+	def set_initial_bg(self):
+		# rather than selecting any one of the images, just fade out and fade
+		# in the images - keep the same images for the current version
+		bg_files = self._state.get(TAG_ENGINETITLESTATE).get_files()
+		if self._logger is not None:
+			self._logger.debug(
+					f'Random integer : {randint(0, len(bg_files))}')
+		bg = pgimage.load(bg_files[randint(0, len(bg_files)-1)])
+
+		# set up the music as well
+		#self._soundmgr.load_music(self._state.get_mus(), "bg")
+		# scale the background image to match the one with the screen width and
+		# height
+		self._scale_img(self._screen, bg, (pgdisplay.Info().current_w,
+			pgdisplay.Info().current_h), (0, 0))
+
+	def _scale_img(self, surface, img, disp_wh: tuple, pos: tuple):
+		surface.blit(pgtransform.scale(img, (disp_wh[0], disp_wh[1])),
+				pos)
+
 	def show(self):
 		'''
 			@function show
@@ -161,6 +207,7 @@ class Dm:
 			@date Thu, 21 May 2020 18:08:08 +0530
 			@brief member function to be called when the engine is exiting
 		'''
+		#self._soundmgr.stop_music()
 		pgquit()
 
 	def manage(self):
@@ -170,7 +217,14 @@ class Dm:
 			@brief function handling all the events and the other things
 			happening in the game - the dungeon master itself impersonated
 		'''
+		# Sat, 24 Apr 2021 14:30:08 +0530 : this is where the music playing and
+		# all the other codes should be going in.
 		for event in pgevent.get():
+			# check state and load the respective background image	- this
+			# check also needs to be done so that at one loading time, only one
+			# image is shown - working on this one later
+			#self.set_initial_bg()
+			# for the first state get the music and play
 			self.__handle_events(event)
 
 	def init_watch(self):
@@ -196,15 +250,6 @@ class Dm:
 			if self._logger is not None:
 				self._logger.debug("quit event received - doing nothing")
 
-	def __monitor_res(self):
-		'''
-			@function __monitor_res
-			@date Fri, 22 May 2020 12:44:05 +0530
-			@brief internal function monitoring the resource directory and
-			loading the resources in memory
-		'''
-		pass
-
 	def __set_mode(self):
 		'''
 			@function __set_mode
@@ -225,3 +270,24 @@ class Dm:
 			the system running this engine
 		'''
 		self._resolutions = pgdisplay.list_modes()
+
+	def run(self):
+		'''
+			@function run
+			@date Tue, 13 Apr 2021 11:43:01 +0530
+			@brief function to run the main loop of the game
+		'''
+		self.set_initial_bg()
+		#self._bg_sound.play()
+		while True:
+			if self._soundmgr.get_loaded_music("engine-bg") is None:
+				self._soundmgr.load_sound(
+						self._state[TAG_ENGINETITLESTATE].get_mus(),
+						'engine-bg')
+			if self._logger is not None:
+				self._logger.debug(
+				f'Is Music playing :{self._soundmgr.is_playing()}')
+			self._soundmgr.play_music("engine-bg")
+			self.manage()
+			self.update()
+			self._clock.tick(self._fps)
