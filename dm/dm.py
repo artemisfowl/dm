@@ -174,8 +174,6 @@ class Dm:
 					f'Random integer : {randint(0, len(bg_files))}')
 		bg = pgimage.load(bg_files[randint(0, len(bg_files)-1)])
 
-		# set up the music as well
-		#self._soundmgr.load_music(self._state.get_mus(), "bg")
 		# scale the background image to match the one with the screen width and
 		# height
 		self._scale_img(self._screen, bg, (pgdisplay.Info().current_w,
@@ -226,6 +224,7 @@ class Dm:
 			#self.set_initial_bg()
 			# for the first state get the music and play
 			self.__handle_events(event)
+			self._soundmgr.play_music("engine-bg")
 
 	def init_watch(self):
 		'''
@@ -287,7 +286,6 @@ class Dm:
 			if self._logger is not None:
 				self._logger.debug(
 				f'Is Music playing :{self._soundmgr.is_playing()}')
-			self._soundmgr.play_music("engine-bg")
 			self.manage()
 			self.update()
 			self._clock.tick(self._fps)
